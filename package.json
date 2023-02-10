@@ -1,0 +1,31 @@
+{
+  "name": "softwarealuguel-be",
+  "version": "1.0.0",
+  "description": "Back-end do software de aluguel direto com o dono (ADD). Aqui estão todos os endPoints.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ragnermoura/softwareAluguel-be.git"
+  },
+  "author": "Willian Ragner",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ragnermoura/softwareAluguel-be/issues"
+  },
+  "homepage": "https://github.com/ragnermoura/softwareAluguel-be#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "body-parser": "^1.20.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
+    "morgan": "^1.10.0",
+    "mysql": "^2.18.1",
+    "nodemon": "^2.0.20",
+    "twilio": "^4.7.2",
+    "xpress": "^2.4.6"
+  }
+}
