@@ -6,20 +6,37 @@ router.get('/', (req, res, next) => {
     mysql.getConnection((error, conn) => {
         if (error) { return res.status(500).send({ error: error }) }
         conn.query(
-            'SELECT * FROM tb009_plataforma',
+            'SELECT * FROM tb003_imovel',
             (error, result, fields) => {
                 if (error) { return res.status(500).send({ error: error }) }
                 const response = {
                     quantidade: result.length,
-                    planos: result.map(plan => {
+                    imoveis: result.map(imov => {
                         return {
-                            id_plano: plan.id_plano,
-                            plano: plan.nome_plano,
-                            valor: plan.valor_plano,
+                            id_imovel: imov.id_imovel,
+                            nome: imov.nome,
+                            descricao: imov.descricao,
+                            tipo: imov.tipo,
+                            valor: imov.valor,
+                            quartos: imov.quartos,
+                            garagem: imov.garagem,
+                            andar: imov.andar,
+                            area: imov.area,
+                            cozinha: imov.cozinha,
+                            varanda: imov.varanda,
+                            metros: imov.metros,
+                            casal: imov.casal,
+                            habitantes: imov.habitantes,
+                            crianca: imov.crianca,
+                            lazer: imov.lazer,
+                            piscina: imov.piscina,
+                            churrasqueira: imov.churrasqueira,
+                            foto: imov.fotos,
+                            id_user: imov.id_user,
                             request: {
                                 tipo: 'GET',
-                                descricao: 'Retorna todos os planos',
-                                url: 'http://localhost:3000/planos/' + plan.id_plano
+                                descricao: 'Retorna todos os Imóveis',
+                                url: 'http://localhost:3000/imoveis/' + imov.id_imovel
                             }
                         }
                     })
@@ -33,14 +50,32 @@ router.get('/', (req, res, next) => {
     })
 });
 
-router.post('/', (req, res, next) => {
+router.post('/cadastro', (req, res, next) => {
     mysql.getConnection((error, conn) => {
         if (error) { return res.status(500).send({ error: error }) }
         conn.query(
-            'INSERT INTO tb009_plataforma (nome_plano, valor_plano) VALUES (?,?)',
+            'INSERT INTO tb003_imovel (nome, descricao, tipo, valor, quartos, garagem, andar, area_total, cozinha, varanda, metros_quadrados, banheiro, casal, habitantes, crianca, lazer, piscina, churrasqueira, fotos_casa, id_user ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
             [
-                req.body.plano,
+                req.body.nome,
+                req.body.descricao,
+                req.body.tipo,
                 req.body.valor,
+                req.body.quartos,
+                req.body.garagem,
+                req.body.andar,
+                req.body.area_total,
+                req.body.cozinha,
+                req.body.varanda,
+                req.body.metros_quadrados,
+                req.body.banheiro,
+                req.body.casal,
+                req.body.habitantes,
+                req.body.crianca,
+                req.body.lazer,
+                req.body.piscina,
+                req.body.churrasqueira,
+                req.body.fotos,
+                req.body.id_user,
             ],
             (error, result, field) => {
                 conn.release();
@@ -52,15 +87,15 @@ router.post('/', (req, res, next) => {
                 }
 
                 const response = {
-                    mensagem: 'Plano cadastrado com sucesso',
-                    planoCriado: {
-                        id_plano: result.id_plano,
-                        plano: req.body.plano,
-                        valor: req.body.valor,
+                    mensagem: 'Imóvel cadastrado com sucesso',
+                    imovelCriado: {
+                        id_imovel: result.id_imovel,
+                        nome: req.body.nome,
+                        descricao: req.body.descricao,
                         request: {
                             tipo: 'POST',
                             descricao: 'Insere um novo planos',
-                            url: 'http://localhost:3000/planos'
+                            url: 'http://localhost:3000/imoveis'
                         }
                     }
                 }
@@ -71,25 +106,25 @@ router.post('/', (req, res, next) => {
 
 });
 
-router.get('/:id_plano', (req, res, next) => {
+router.get('/:id_imovel', (req, res, next) => {
     mysql.getConnection((error, conn) => {
         if (error) { return res.status(500).send({ error: error }) }
         conn.query(
-            'SELECT * FROM tb009_plataforma WHERE id_plano = ?',
+            'SELECT * FROM tb003_imovel WHERE id_imovel = ?',
             [req.params.id_user],
             (error, result, fields) => {
                 if (error) { return res.status(500).send({ error: error }) }
 
                 if (result.length == 0) {
                     return res.status(404).send({
-                        mensagem: 'Não foi encontrado Plano com esse ID'
+                        mensagem: 'Não foi encontrado um imóvel com esse ID'
                     })
                 }
                 const response = {
                     plano: {
-                        id_plano: result[0].id_plano,
-                        plano: result[0].plano,
-                        valor: result[0].valor,
+                        id_imovel: result[0].id_imovel,
+                        nome: result[0].nome,
+                        descricao: result[0].descricao,
                         request: {
                             tipo: 'GET',
                             descricao: 'Retorna um novo planos',
@@ -108,14 +143,49 @@ router.patch('/', (req, res, next) => {
     mysql.getConnection((error, conn) => {
         if (error) { return res.status(500).send({ error: error }) }
         conn.query(
-            `UPDATE tb009_plataforma 
-            SET nome_plano = ?, 
-            valor_plano = ?,
-            WHERE id_plano = ?`,
+            `UPDATE tb003_imovel
+            SET nome = ?, 
+            descricao = ?,
+            tipo = ?,
+            valor = ?,
+            quartos = ?,
+            garagem = ?,
+            andar = ?,
+            area_total = ?,
+            cozinha = ?,
+            varanda = ?,
+            metros_quadrados = ?,
+            banheiro = ?,
+            casal = ?,
+            habitantes = ?,
+            crianca = ?,
+            lazer = ?,
+            piscina = ?,
+            churrasqueira = ?,
+            fotos_casa = ?,
+            id_user = ?,
+            WHERE id_imovel = ?`,
             [
-                req.body.plano,
+                req.body.nome,
+                req.body.descricao,
+                req.body.tipo,
                 req.body.valor,
-                req.body.id_plano,
+                req.body.quartos,
+                req.body.garagem,
+                req.body.andar,
+                req.body.area_total,
+                req.body.cozinha,
+                req.body.varanda,
+                req.body.metros_quadrados,
+                req.body.banheiro,
+                req.body.casal,
+                req.body.habitantes,
+                req.body.crianca,
+                req.body.lazer,
+                req.body.piscina,
+                req.body.churrasqueira,
+                req.body.fotos,
+                req.body.id_user,
             ],
             (error, result, field) => {
                 conn.release();
@@ -125,15 +195,15 @@ router.patch('/', (req, res, next) => {
                     });
                 }
                 const response = {
-                    mensagem: 'Plano atualizado com sucesso',
+                    mensagem: 'Imóvel atualizado com sucesso',
                     planoCriado: {
-                        id_plano: req.body.id_plano,
-                        plano: req.body.plano,
-                        valor: req.body.valor,
+                        id_imovel: req.body.id_imovel,
+                        nome: req.body.nome,
+                        descricao: req.body.descricao,
                         request: {
                             tipo: 'PATCH',
-                            descricao: 'Atualiza um plano',
-                            url: 'http://localhost:3000/planos/' + req.body.id_plano
+                            descricao: 'Atualiza um Imóvel',
+                            url: 'http://localhost:3000/imoveis/' + req.body.id_imovel
                         }
                     }
                 }
@@ -147,19 +217,19 @@ router.delete('/', (req, res, next) => {
     mysql.getConnection((error, conn) => {
         if (error) { return res.status(500).send({ error }) }
         conn.query(
-            'DELETE FROM tb009_plataforma WHERE id_plano = ?',
+            'DELETE FROM tb003_imovel WHERE id_imovel = ?',
             [
-                req.body.id_plano
+                req.body.id_imovel
             ],
             (error, result, field) => {
                 conn.release();
                 if (error) { return res.status(500).send({ error: error }) }
                 const response = {
-                    mensagem: 'Plano removido com sucesso',
+                    mensagem: 'Imóvel removido com sucesso',
                     request: {
                         tipo: 'POST',
-                        desricao: 'Insere um plano',
-                        url: 'http://localhost:3000/planos/'
+                        desricao: 'Insere um imóvel',
+                        url: 'http://localhost:3000/imoveis/'
                     }
                 }
                 return res.status(202).send(response);
