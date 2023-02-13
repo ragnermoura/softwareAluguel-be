@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
+const cors = require('cors')
 
 const rotaPlanos = require('./routes/planos')
 const rotaUsuarios = require('./routes/usuarios')
@@ -17,16 +18,18 @@ const rotaAvaliacao = require('./routes/avaliacao')
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(cors())
 
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*')
+    res.header("Access-Control-Allow-Credentials", "true")
     res.header(
         'Access-Control-Allow-Header',
-        'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+        'Origin, X-Api-Key, X-Requested-With, Content-Type, Accept, Authorization'
     );
 
     if (req.method === 'OPTIONS') {
-        res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET')
+        res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET, OPTIONS')
         return res.status(200).send({})
     }
     next();

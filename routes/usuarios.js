@@ -3,6 +3,9 @@ const router = express.Router();
 const mysql = require('../mysql').pool;
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const nodemailer = require("nodemailer");
+
+
 
 
 
@@ -107,6 +110,8 @@ router.delete('/delete', (req, res, next) => {
 });
 
 router.post('/cadastro', (req, res, next) => {
+    
+
     mysql.getConnection((err, conn) => {
         if (err) { return res.status(500).send({ error: error }) }
         conn.query('SELECT * FROM tb001_usuario WHERE email = ?', [req.body.email], (error, result) => {
@@ -121,7 +126,7 @@ router.post('/cadastro', (req, res, next) => {
                         return res.status(500).send({ error: errBcrypt })
                     }
                     conn.query(
-                        'INSERT INTO tb001_usuario (nome, sobrenome, endereco, cidade, estado, cep, telefone1, telefone2, email, senha, id_plano, id_status, id_nivel) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
+                        'INSERT INTO tb001_usuario (nome, sobrenome, endereco, cidade, estado, cep, telefone1, telefone2, email, senha, id_plano, id_status, id_nivel, code) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
                         [req.body.nome,
                         req.body.sobrenome,
                         req.body.endereco,
@@ -134,7 +139,8 @@ router.post('/cadastro', (req, res, next) => {
                             hash,
                         req.body.plano,
                         req.body.status,
-                        req.body.nivel],
+                        req.body.nivel,
+                        req.body.code],
 
                         (error, result) => {
                             conn.release();
@@ -144,13 +150,55 @@ router.post('/cadastro', (req, res, next) => {
                                 });
                             }
 
+                           
+
+                           if(req.body.nivel === 2 ){
+                           
+                            async function main() {
+                               
+                                let testAccount = await nodemailer.createTestAccount(); 
+                                let transporter = nodemailer.createTransport({
+                                    host: "smtp.hostinger.com",
+                                    port: 465,
+                                    secure: true, // true for 465, false for other ports
+                                    auth: {
+                                        user: 'noreply@imoveldiretocomodono.com.br', // generated ethereal user
+                                        pass: '10Minutos!', // generated ethereal password
+                                    },
+                                });
+
+                                let info = await transporter.sendMail({
+                                    from: '"Imóvel Direto com o Dono 🚀" <noreply@imoveldiretocomodono.com.br>', // sender address
+                                    to:  req.body.email, // list of receivers
+                                    subject: "Sua conta foi criada ✔", // Subject line
+                                    // text: "Hello world?", // plain text body
+                                    html: "<div style='background-color: #f26022; width: 100%; height: 80px; text-align: center;'></div><div><h1 style='color: #f26022; text-align: center;'>ESTE É O SEU CÓDIGO DE CONFIRMAÇÃO</h1><h1 style='color: #000; text-align: center;'>"+req.body.code+"</h1><h5 style='color: #767675; text-align: center;'>Todos os Direitos Reservados - 2023 | Imóvel Direto com o Dono</h5><h5 style='color: #767675; text-align: center;'><b>Jobrapido</b> S.r.l. via Paleocapa, 7 - 20121 Milan - Italy - Tax code and VAT number: IT11876271005</h5>", // html body
+                                    
+                                });
+
+                                console.log("Message sent: %s", info.messageId);
+                                // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+
+                               
+                                console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+                                // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+                            }
+
+                            main().catch(console.error);
+
+                           }
+                           
                             const response = {
                                 mensagem: 'Usuário cadastrado com sucesso',
+                               
+
                                 usuarioCriado: {
+                                    
                                     id_user: result.insertId,
                                     nome: req.body.nome,
                                     email: req.body.email,
-                                    telefone: req.body.telefone,
+                                    telefone1: req.body.telefone,
+                                    nivel: req.body.nivel,
 
                                     request: {
                                         tipo: 'GET',
@@ -158,7 +206,9 @@ router.post('/cadastro', (req, res, next) => {
                                         url: 'http://localhost:3000/usuarios'
                                     }
                                 }
+                                
                             }
+                          
                             return res.status(202).send(response);
 
                         });
@@ -167,6 +217,28 @@ router.post('/cadastro', (req, res, next) => {
         })
 
     });
+
+}),
+
+router.post('/code', (req, res, next) => {
+    mysql.getConnection((err, conn) => {
+        if (err) { return res.status(500).send({ error: error }) }
+        const query = `SELECT * FROM tb001_usuario WHERE code = ? AND id_user = ?`;
+        conn.query(query, [req.body.code, req.body.id], (error, results, field) => {
+            conn.release();
+
+            if (err) { return res.status(500).send({ error: error }) }
+            if (results.length < 1) {
+                return res.status(401).send({
+                    mensagem: 'Código não confere.'
+                })
+
+            }
+            res.status(201).send({
+                mensagem: 'código confere'
+            });
+        })
+    })
 
 }),
 
@@ -194,11 +266,11 @@ router.post('/cadastro', (req, res, next) => {
                         const token = jwt.sign({
                             id_usuario: results[0].id_user,
                             nome: results[0].nome,
-                            nome: results[0].sobrenome,
+                            sobrenome: results[0].sobrenome,
                             email: results[0].email,
                             telefone1: results[0].telefone1,
-                            telefone1: results[0].telefone2,
-                            nivel: results[0].nivel
+                            telefone2: results[0].telefone2,
+                            id_nivel: results[0].id_nivel
                         }, process.env.JWT_KEY, {
                             expiresIn: "6h"
                         })
@@ -213,6 +285,9 @@ router.post('/cadastro', (req, res, next) => {
             })
         })
     }),
+
+
+    
 
 
 
