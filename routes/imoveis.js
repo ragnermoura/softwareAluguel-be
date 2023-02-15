@@ -54,7 +54,7 @@ router.post('/cadastro', (req, res, next) => {
     mysql.getConnection((error, conn) => {
         if (error) { return res.status(500).send({ error: error }) }
         conn.query(
-            'INSERT INTO tb003_imovel (nome, descricao, tipo, valor, quartos, garagem, andar, area_total, cozinha, varanda, metros_quadrados, banheiro, casal, habitantes, crianca, lazer, piscina, churrasqueira, fotos_casa, id_user ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+            'INSERT INTO tb003_imovel (nome, descricao, tipo, valor, quartos, garagem, andar, area_total, cozinha, varanda, metros_quadrados, banheiro, casal, habitantes, crianca, lazer, piscina, churrasqueira, cep, endereco, numero, estado, id_user ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
             [
                 req.body.nome,
                 req.body.descricao,
@@ -64,6 +64,10 @@ router.post('/cadastro', (req, res, next) => {
                 req.body.garagem,
                 req.body.andar,
                 req.body.area_total,
+                req.body.cep,
+                req.body.endereco,
+                req.body.numero,
+                req.body.estado,
                 req.body.cozinha,
                 req.body.varanda,
                 req.body.metros_quadrados,

@@ -7,9 +7,6 @@ const nodemailer = require("nodemailer");
 
 
 
-
-
-
 router.get('/', (req, res, next) => {
     mysql.getConnection((error, conn) => {
         if (error) { return res.status(500).send({ error: error }) }

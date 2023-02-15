@@ -9,6 +9,7 @@ const rotaUsuarios = require('./routes/usuarios')
 const rotaNivel = require('./routes/nivel')
 const rotaStatus = require('./routes/status')
 const rotaImoveis = require('./routes/imoveis')
+const rotaImagem = require('./routes/imagem')
 const rotaDocInquilino = require('./routes/docsInquilino')
 const rotaDocFiador = require('./routes/docsFiador')
 const rotaContrato = require('./routes/contrato')
@@ -41,6 +42,7 @@ app.use('/usuarios', rotaUsuarios);
 app.use('/nivel', rotaNivel);
 app.use('/status', rotaStatus);
 app.use('/imoveis', rotaImoveis);
+app.use('/imagem', rotaImagem);
 app.use('/docs-inquilinos', rotaDocInquilino);
 app.use('/doc-fiador', rotaDocFiador);
 app.use('/contrato', rotaContrato);
