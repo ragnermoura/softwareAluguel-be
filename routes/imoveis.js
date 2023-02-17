@@ -2,6 +2,9 @@ const express = require('express');
 const router = express.Router();
 const mysql = require('../mysql').pool;
 
+
+const { imageUpload } = require('../helpers/image-upload')
+
 router.get('/', (req, res, next) => {
     mysql.getConnection((error, conn) => {
         if (error) { return res.status(500).send({ error: error }) }
@@ -50,7 +53,7 @@ router.get('/', (req, res, next) => {
     })
 });
 
-router.post('/cadastro', (req, res, next) => {
+router.post('/cadastro', imageUpload.single('image') ,  (req, res, next) => {
     mysql.getConnection((error, conn) => {
         if (error) { return res.status(500).send({ error: error }) }
         conn.query(
@@ -78,7 +81,7 @@ router.post('/cadastro', (req, res, next) => {
                 req.body.lazer,
                 req.body.piscina,
                 req.body.churrasqueira,
-                req.body.fotos,
+                req.file.path,
                 req.body.id_user,
             ],
             (error, result, field) => {
@@ -143,7 +146,7 @@ router.get('/:id_imovel', (req, res, next) => {
     })
 });
 
-router.patch('/', (req, res, next) => {
+router.patch('/', imageUpload.single('image'), (req, res, next) => {
     mysql.getConnection((error, conn) => {
         if (error) { return res.status(500).send({ error: error }) }
         conn.query(
@@ -188,7 +191,7 @@ router.patch('/', (req, res, next) => {
                 req.body.lazer,
                 req.body.piscina,
                 req.body.churrasqueira,
-                req.body.fotos,
+                req.file.path,
                 req.body.id_user,
             ],
             (error, result, field) => {

@@ -1,18 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const mysql = require('../mysql').pool;
-
-const multer = require('multer');
-const storage = multer.diskStorage({
-    destination: function(req, file, cb) {
-        cb(null, 'uploads/');
-    },
-    filename: function(req, file, cb) {
-        cb(null, Date.now() + '-' + file.originalname);
-    }
-});
-
-const upload = multer({ storage: storage }).single('imagem');
+const { imageUpload } = require('../helpers/image-upload')
 
 
 router.get('/', (req, res, next) => {
@@ -47,7 +36,7 @@ router.get('/', (req, res, next) => {
     })
 });
 
-router.post('/cadastro', (req, res, next) => {
+router.post('/cadastro', imageUpload.array("images"), (req, res, next) => {
     upload(req, res, function(err) {
         if (err instanceof multer.MulterError) {
             return res.status(500).json(err);
@@ -57,39 +46,40 @@ router.post('/cadastro', (req, res, next) => {
         
         mysql.getConnection((error, conn) => {
             if (error) { return res.status(500).send({ error: error }) }
-            conn.query(
-                'INSERT INTO tb012_imagem (id_imovel, id_user, imagem) VALUES (?,?,?)',
-                [
-                    req.body.id_imovel,
-                    req.body.id_user, 
-                    req.file.filename, // salva o nome do arquivo na base de dados
-                ],
-                (error, result, field) => {
-                    conn.release();
-                    if (error) {
-                        return res.status(500).send({
-                            error: error,
-                            response: null
-                        });
-                    }
 
-                    const response = {
-                        mensagem: 'Imagem cadastrada com sucesso',
-                        imovelCriado: {
-                            id_imagem: result.id_imagem,
-                            id_imovel: req.body.id_imovel,
-                            id_user: req.body.id_user,
-                            imagem: req.file.filename, // retorna o nome do arquivo salvo
-                            request: {
-                                tipo: 'POST',
-                                descricao: 'Insere uma nova imagem',
-                                url: 'http://localhost:3000/imagem'
-                            }
+            let images = req.files
+            try{
+
+            
+            
+            images?.map( file => {
+                conn.query(
+                    'INSERT INTO tb012_imagem (id_imovel, id_user, imagem) VALUES (?,?,?)',
+                    [
+                        req.body.id_imovel,
+                        req.body.id_user, 
+                        file.path, // salva o nome do arquivo na base de dados
+                    ],
+                    (error, result, field) => {
+                        conn.release();
+                        if (error) {
+                            return res.status(500).send({
+                                error: error,
+                                response: null
+                            });
                         }
+    
+                       
+                        
                     }
-                    return res.status(202).send(response);
-                }
-            )
+                )
+            })
+
+            return res.status(201);
+        } catch(err){
+            console.log(err)
+        }
+            
         });
     });
 });
