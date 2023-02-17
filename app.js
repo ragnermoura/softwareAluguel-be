@@ -49,6 +49,10 @@ app.use('/contrato', rotaContrato);
 app.use('/pag-imovel', rotaPagImovel);
 app.use('/avaliacao', rotaAvaliacao);
 
+app.get('/api/security', (req,res) => {
+    res.status(200).json({message: 'OK'})
+})
+
 
 app.use((req, res, next) => {
     const erro = new Error('Rota não encontrada');
