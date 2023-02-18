@@ -4,6 +4,8 @@ const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const cors = require('cors')
 
+require('dotenv').config();
+
 const rotaPlanos = require('./routes/planos')
 const rotaUsuarios = require('./routes/usuarios')
 const rotaNivel = require('./routes/nivel')
