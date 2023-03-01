@@ -55,6 +55,7 @@ app.get('/api/security', (req,res) => {
     res.status(200).json({message: 'OK'})
 })
 
+app.use(express.static('public'))
 
 app.use((req, res, next) => {
     const erro = new Error('Rota não encontrada');
